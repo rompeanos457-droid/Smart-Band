@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartBand | Tecnología que abre caminos</title>
+    <style>
+        :root {
+            --bg-app: #070c16;
+            --bg-card: #10192b;
+            --bg-card-soft: #162238;
+            --azul: #00a8ff;
+            --azul-claro: #38bdf8;
+            --azul-oscuro: #0284c7;
+            --texto: #f1f5f9;
+            --texto-muted: #94a3b8;
+            --borde: rgba(56, 189, 248, 0.22);
+            --verde: #10b981;
+            --amarillo: #f59e0b;
+        }
+
+        body.alto-contraste {
+            --bg-app: #000000;
+            --bg-card: #0a0f1a;
+            --bg-card-soft: #111827;
+            --borde: rgba(56, 189, 248, 0.65);
+            --texto: #ffffff;
+            --texto-muted: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+            background-color: var(--bg-app);
+            color: var(--texto);
+            line-height: 1.55;
+            padding-bottom: 92px;
+            transition: background-color 0.25s ease;
+        }
+
+        /* Barra superior */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            background: rgba(7, 12, 22, 0.94);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--borde);
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand-mini {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            cursor: pointer;
+        }
+
+        .brand-mini img {
+            height: 36px;
+            width: auto;
+            border-radius: 6px;
+        }
+
+        .badge-bt {
+            font-size: 0.78rem;
+            padding: 5px 11px;
+            border-radius: 999px;
+            background: rgba(0, 168, 255, 0.16);
+            border: 1px solid rgba(56, 189, 248, 0.45);
+            color: var(--azul-claro);
+            font-weight: 600;
+        }
+
+        .app-container {
+            max-width: 560px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        /* Vistas */
+        .vista {
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+            animation: fadeIn 0.22s ease;
+        }
+
+        .vista.activa {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Banner principal */
+        .hero-banner {
+            background: linear-gradient(135deg, #0284c7 0%, #00a8ff 58%, #0369a1 100%);
+            border-radius: 20px;
+            padding: 24px 22px;
+            color: #ffffff;
+            box-shadow: 0 12px 28px rgba(0, 168, 255, 0.25);
+        }
+
+        .hero-tag {
+            font-size: 0.85rem;
+            opacity: 0.92;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .hero-banner h1 {
+            font-size: 1.85rem;
+            line-height: 1.2;
+            margin-bottom: 8px;
+        }
+
+        .hero-banner p {
+            font-size: 0.96rem;
+            opacity: 0.96;
+        }
+
+        /* Tarjetas generales */
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--borde);
+            border-radius: 18px;
+            padding: 18px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+        }
+
+        .stat-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--azul-claro);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: rgba(0, 168, 255, 0.14);
+            color: var(--azul-claro);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .stat-number {
+            font-size: 1.55rem;
+            font-weight: 800;
+            line-height: 1.1;
+            color: #ffffff;
+        }
+
+        .stat-title {
+            font-weight: 700;
+            font-size: 0.98rem;
+            color: var(--texto);
+        }
+
+        .stat-desc {
+            font-size: 0.85rem;
+            color: var(--texto-muted);
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .card-sub {
+            font-size: 0.9rem;
+            color: var(--texto-muted);
+            margin-bottom: 14px;
+        }
+
+        .label-group {
+            font-size: 0.92rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--texto);
+        }
+
+        /* Chips / Filtros */
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .chip {
+            border: 1px solid var(--borde);
+            background: var(--bg-card-soft);
+            color: var(--texto);
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 0.86rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .chip.active {
+            background: var(--azul);
+            border-color: var(--azul-claro);
+            color: #04101f;
+        }
+
+        /* Interruptores */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 0;
+            border-top: 1px solid rgba(148, 163, 184, 0.14);
+        }
+
+        .toggle-info strong {
+            display: block;
+            font-size: 0.95rem;
+            color: #ffffff;
+        }
+
+        .toggle-info span {
+            font-size: 0.84rem;
+            color: var(--texto-muted);
+        }
+
+        .switch {
+            position: relative;
+            width: 48px;
+            height: 26px;
+            flex-shrink: 0;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background-color: #334155;
+            border-radius: 999px;
+            transition: 0.25s;
+        }
+
+        .slider::before {
+            content: "";
+            position: absolute;
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: #ffffff;
+            border-radius: 50%;
+            transition: 0.25s;
+        }
+
+        .switch input:checked + .slider {
+            background-color: var(--azul);
+        }
+
+        .switch input:checked + .slider::before {
+            transform: translateX(22px);
+        }
+
+        /* Botones */
+        .btn-primary {
+            width: 100%;
+            margin-top: 14px;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(90deg, var(--azul-oscuro), var(--azul));
+            color: #ffffff;
+            font-size: 0.96rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: filter 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            filter: brightness(1.08);
+        }
+
+        .btn-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .btn-secondary {
+            padding: 11px 12px;
+            border-radius: 12px;
+            border: 1px solid var(--borde);
+            background: var(--bg-card-soft);
+            color: var(--texto);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: border-color 0.2s ease, background 0.2s ease;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--azul-claro);
+            background: rgba(0, 168, 255, 0.12);
+        }
+
+        .feedback-msg {
+            margin-top: 10px;
+            font-size: 0.87rem;
+            color: var(--verde);
+            font-weight: 600;
+            min-height: 20px;
+        }
+
+        /* Lista ¿Cómo funciona? */
+        .feature-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px 0;
+            border-top: 1px solid rgba(148, 163, 184, 0.14);
+        }
+
+        .feature-item:first-of-type {
+            border-top: none;
+        }
+
+        .feature-dot {
+            width: 36px;
+            height: 36px;
+            border-radius: 11px;
+            background: rgba(56, 189, 248, 0.14);
+            color: var(--azul-claro);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .feature-item h3 {
+            font-size: 0.98rem;
+            color: #ffffff;
+            margin-bottom: 2px;
+        }
+
+        .feature-item p {
+            font-size: 0.87rem;
+            color: var(--texto-muted);
+        }
+
+        /* Tarjetas de rutas accesibles */
+        .route-card {
+            background: var(--bg-card);
+            border: 1px solid var(--borde);
+            border-radius: 16px;
+            padding: 15px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .route-card:hover {
+            border-color: var(--azul-claro);
+        }
+
+        .route-card.selected {
+            background: rgba(0, 168, 255, 0.12);
+            border: 1.5px solid var(--azul-claro);
+        }
+
+        .route-title {
+            font-size: 1.03rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 2px;
+        }
+
+        .route-sub {
+            font-size: 0.85rem;
+            color: var(--texto-muted);
+            margin-bottom: 10px;
+        }
+
+        .badges-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .pill {
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 8px;
+        }
+
+        .pill-green {
+            background: rgba(16, 185, 129, 0.18);
+            color: #34d399;
+        }
+
+        .pill-yellow {
+            background: rgba(245, 158, 11, 0.18);
+            color: #fbbf24;
+        }
+
+        .pill-gray {
+            background: rgba(148, 163, 184, 0.18);
+            color: #cbd5e1;
+        }
+
+        .pill-blue {
+            background: rgba(56, 189, 248, 0.16);
+            color: var(--azul-claro);
+        }
+
+        /* Plano SVG interactivo */
+        .map-box {
+            background: #0b1322;
+            border: 1px solid var(--borde);
+            border-radius: 18px;
+            padding: 12px;
+        }
+
+        .map-svg {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 12px;
+        }
+
+        .map-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 10px;
+            font-size: 0.78rem;
+            color: var(--texto-muted);
+            justify-content: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .line-sample {
+            width: 16px;
+            height: 3px;
+            border-radius: 2px;
+        }
+
+        .dot-sample {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--azul-claro);
+        }
+
+        /* Indicaciones paso a paso */
+        .step-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .step-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 0.88rem;
+            color: var(--texto-muted);
+            margin-bottom: 14px;
+        }
+
+        .step-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .step-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.93rem;
+            color: var(--texto);
+        }
+
+        .step-num {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: var(--azul);
+            color: #04101f;
+            font-weight: 800;
+            font-size: 0.82rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* ==================== ESTILOS DE BALIZAS DEL CAMPUS ==================== */
+        .beacon-alert-banner {
+            background: linear-gradient(135deg, #0284c7, #00a8ff);
+            color: #ffffff;
+            border-radius: 16px;
+            padding: 15px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            box-shadow: 0 10px 24px rgba(0, 168, 255, 0.25);
+        }
+
+        .beacon-alert-banner.hidden {
+            display: none;
+        }
+
+        .beacon-alert-title {
+            font-weight: 700;
+            font-size: 0.98rem;
+            margin-bottom: 3px;
+        }
+
+        .beacon-alert-text {
+            font-size: 0.88rem;
+            opacity: 0.96;
+        }
+
+        .btn-close-banner {
+            background: rgba(255, 255, 255, 0.18);
+            border: none;
+            color: #ffffff;
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .beacon-card {
+            background: var(--bg-card);
+            border: 1px solid var(--borde);
+            border-radius: 18px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .beacon-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .beacon-name-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 1.03rem;
+            color: #ffffff;
+        }
+
+        .beacon-icon {
+            color: var(--azul-claro);
+            font-weight: 800;
+            font-size: 0.95rem;
+        }
+
+        .beacon-code {
+            font-size: 0.84rem;
+            color: var(--texto-muted);
+            margin-top: 2px;
+        }
+
+        .status-badge {
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 999px;
+            flex-shrink: 0;
+        }
+
+        .status-activa {
+            background: rgba(16, 185, 129, 0.18);
+            color: #34d399;
+        }
+
+        .status-mantenimiento {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fbbf24;
+        }
+
+        .status-inactiva {
+            background: rgba(148, 163, 184, 0.2);
+            color: #cbd5e1;
+        }
+
+        .beacon-msg {
+            font-size: 0.92rem;
+            color: var(--texto);
+        }
+
+        .battery-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .battery-icon {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--texto-muted);
+            border: 1px solid var(--borde);
+            border-radius: 4px;
+            padding: 1px 5px;
+        }
+
+        .battery-track {
+            flex: 1;
+            height: 6px;
+            background: rgba(148, 163, 184, 0.2);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .battery-fill {
+            height: 100%;
+            background: var(--texto);
+            border-radius: 999px;
+        }
+
+        .battery-pct {
+            font-size: 0.84rem;
+            color: var(--texto-muted);
+            font-weight: 600;
+            min-width: 36px;
+            text-align: right;
+        }
+
+        .beacon-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-top: 2px;
+        }
+
+        .mode-tag {
+            font-size: 0.82rem;
+            font-weight: 600;
+            padding: 5px 11px;
+            border-radius: 9px;
+            background: var(--bg-card-soft);
+            border: 1px solid var(--borde);
+            color: var(--texto);
+        }
+
+        .btn-test-alert {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            background: #e2e8f0;
+            color: #090d16;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: filter 0.2s ease;
+        }
+
+        .btn-test-alert:hover:not(:disabled) {
+            filter: brightness(1.05);
+        }
+
+        .btn-test-alert:disabled {
+            background: #1e293b;
+            color: #64748b;
+            border-color: rgba(148, 163, 184, 0.15);
+            cursor: not-allowed;
+        }
+
+        /* Pestañas de información del proyecto */
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .tab-btn {
+            padding: 7px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--borde);
+            background: var(--bg-card-soft);
+            color: var(--texto-muted);
+            font-size: 0.84rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .tab-btn.active {
+            background: rgba(0, 168, 255, 0.22);
+            border-color: var(--azul-claro);
+            color: #ffffff;
+        }
+
+        .info-panel p {
+            font-size: 0.93rem;
+            color: var(--texto);
+        }
+
+        .precio-destacado {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 7px 12px;
+            border-radius: 8px;
+            background: rgba(0, 168, 255, 0.16);
+            color: var(--azul-claro);
+            font-weight: 700;
+        }
+
+        /* Barra inferior fija */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 16, 29, 0.97);
+            border-top: 1px solid var(--borde);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 6px;
+            z-index: 30;
+        }
+
+        .nav-item {
+            background: none;
+            border: none;
+            color: var(--texto-muted);
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 10px;
+        }
+
+        .nav-item.active,
+        .nav-item:hover {
+            color: var(--azul-claro);
+            background: rgba(56, 189, 248, 0.08);
+        }
+    </style>
+</head>
+<body class="alto-contraste">
+
+    <header class="topbar">
+        <div class="brand-mini" onclick="cambiarVista('inicio')">
+            <img src="SmartBand.jpg" alt="Logo SmartBand">
+            <span>SmartBand</span>
+        </div>
+        <span class="badge-bt" id="estadoBluetooth">BT Activo</span>
+    </header>
+
+    <main class="app-container">
+
+        <!-- ==================== VISTA 1: INICIO ==================== -->
+        <div id="vista-inicio" class="vista activa">
+            <section class="hero-banner">
+                <div class="hero-tag">SmartBand • Tecnología que abre caminos</div>
+                <h1>Hola, bienvenido</h1>
+                <p>Tu entorno, sin barreras: rutas accesibles, balizas Bluetooth que te guían por vibración y una app que se adapta a ti.</p>
+            </section>
+
+            <section class="card stat-card" onclick="cambiarVista('mapa')">
+                <div class="stat-icon">6</div>
+                <div>
+                    <div class="stat-number">6</div>
+                    <div class="stat-title">Rutas accesibles</div>
+                    <div class="stat-desc">Trazos disponibles en el plano interactivo</div>
+                </div>
+            </section>
+
+            <section class="card stat-card" onclick="cambiarVista('balizas')">
+                <div class="stat-icon">5</div>
+                <div>
+                    <div class="stat-number">5</div>
+                    <div class="stat-title">Balizas activas</div>
+                    <div class="stat-desc">Guiándote en tiempo real con la pulsera</div>
+                </div>
+            </section>
+
+            <section class="card stat-card" onclick="cambiarVista('mapa')">
+                <div class="stat-icon">7</div>
+                <div>
+                    <div class="stat-number">7</div>
+                    <div class="stat-title">Zonas cubiertas</div>
+                    <div class="stat-desc">Espacios configurados con señal Bluetooth</div>
+                </div>
+            </section>
+
+            <!-- Perfil de accesibilidad -->
+            <section class="card">
+                <h2>Perfil de accesibilidad</h2>
+                <p class="card-sub">Configura cómo se adapta la app y la pulsera a tus necesidades.</p>
+
+                <div class="label-group">Tipo de discapacidad</div>
+                <div class="chips" id="chipsDiscapacidad">
+                    <button type="button" class="chip" data-val="Sin especificar">Sin especificar</button>
+                    <button type="button" class="chip" data-val="Movilidad">Movilidad</button>
+                    <button type="button" class="chip active" data-val="Visual">Visual</button>
+                    <button type="button" class="chip" data-val="Auditiva">Auditiva</button>
+                </div>
+
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <strong>Alertas de audio y vibración</strong>
+                        <span>La app lee en voz alta y la SmartBand vibra en cada baliza.</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="chkAudio" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <strong>Guía visual</strong>
+                        <span>Resalta rutas y zonas del plano con colores de alto contraste.</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="chkContraste" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <strong>Evitar escaleras</strong>
+                        <span>Prioriza las rutas sin escalones en el mapa.</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="chkEscaleras">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <button type="button" class="btn-primary" id="btnGuardar">Guardar preferencias</button>
+                <div class="feedback-msg" id="mensajePerfil"></div>
+            </section>
+
+            <!-- ¿Cómo funciona? -->
+            <section class="card">
+                <h2>¿Cómo funciona?</h2>
+                <p class="card-sub">Tres piezas trabajan juntas para mejorar tu movilidad en el colegio.</p>
+
+                <div class="feature-item">
+                    <div class="feature-dot">01</div>
+                    <div>
+                        <h3>Mapa de rutas accesibles</h3>
+                        <p>Elige entre rutas sin escalones o asistidas y sigue las indicaciones paso a paso.</p>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-dot">02</div>
+                    <div>
+                        <h3>Balizas Bluetooth</h3>
+                        <p>Cada zona del campus tiene balizas que envían alertas táctiles a tu SmartBand o avisos de audio.</p>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-dot">03</div>
+                    <div>
+                        <h3>Perfil que te adapta</h3>
+                        <p>Tus preferencias ajustan las alertas, los avisos y las rutas recomendadas.</p>
+                    </div>
+                </div>
+
+                <div class="btn-row">
+                    <button type="button" class="btn-secondary" onclick="cambiarVista('mapa')">Abrir el mapa</button>
+                    <button type="button" class="btn-secondary" onclick="cambiarVista('balizas')">Ver balizas</button>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==================== VISTA 2: MAPA DE RUTAS ==================== -->
+        <div id="vista-mapa" class="vista">
+            <div>
+                <h2>Mapa de rutas accesibles</h2>
+                <p class="card-sub" style="margin-bottom: 10px;">Toca una ruta o una baliza del plano para ver sus indicaciones en tiempo real.</p>
+
+                <div class="chips" id="filtrosRutas">
+                    <button type="button" class="chip active" data-filter="todas">Todas</button>
+                    <button type="button" class="chip" data-filter="Sin escalones">Sin escalones</button>
+                    <button type="button" class="chip" data-filter="Asistida">Asistidas</button>
+                    <button type="button" class="chip" data-filter="Estándar">Estándar</button>
+                </div>
+            </div>
+
+            <div id="listaRutas" style="display: flex; flex-direction: column; gap: 12px;"></div>
+
+            <div class="map-box">
+                <svg viewBox="0 0 420 290" class="map-svg" aria-label="Plano interactivo del colegio">
+                    <rect x="0" y="0" width="420" height="290" rx="12" fill="#0d1729" />
+
+                    <rect x="42" y="32" width="102" height="58" rx="8" fill="#15233c" stroke="#2c446e" />
+                    <text x="93" y="64" fill="#cbd5e1" font-size="10" text-anchor="middle" font-weight="600">Aulario Norte</text>
+
+                    <rect x="178" y="24" width="96" height="54" rx="8" fill="#15233c" stroke="#2c446e" />
+                    <text x="226" y="54" fill="#cbd5e1" font-size="10" text-anchor="middle" font-weight="600">Biblioteca</text>
+
+                    <rect x="302" y="32" width="94" height="54" rx="8" fill="#15233c" stroke="#2c446e" />
+                    <text x="349" y="62" fill="#cbd5e1" font-size="10" text-anchor="middle" font-weight="600">Cafetería</text>
+
+                    <rect x="52" y="132" width="96" height="54" rx="8" fill="#15233c" stroke="#2c446e" />
+                    <text x="100" y="162" fill="#cbd5e1" font-size="10" text-anchor="middle" font-weight="600">Laboratorios</text>
+
+                    <rect x="178" y="176" width="94" height="58" rx="8" fill="#15233c" stroke="#2c446e" />
+                    <text x="225" y="208" fill="#cbd5e1" font-size="10" text-anchor="middle" font-weight="600">Auditorio</text>
+
+                    <rect x="302" y="132" width="96" height="84" rx="8" fill="#15233c" stroke="#2c446e" />
+                    <text x="350" y="176" fill="#cbd5e1" font-size="10" text-anchor="middle" font-weight="600">Cancha</text>
+
+                    <rect x="104" y="206" width="56" height="48" rx="8" fill="rgba(16, 185, 129, 0.16)" stroke="rgba(16, 185, 129, 0.35)" />
+                    <rect x="275" y="102" width="18" height="24" rx="6" fill="rgba(16, 185, 129, 0.2)" />
+
+                    <text x="44" y="264" fill="#38bdf8" font-size="10" font-weight="700">Entrada Principal</text>
+
+                    <polyline id="svg-ruta-0" points="349,92 260,132 225,172" fill="none" stroke="#10b981" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="1" />
+                    <polyline id="svg-ruta-1" points="148,162 230,158 298,172" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" opacity="0.35" />
+                    <polyline id="svg-ruta-2" points="93,90 98,132" fill="none" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" opacity="0.35" />
+                    <polyline id="svg-ruta-3" points="274,52 302,56" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" opacity="0.35" />
+                    <polyline id="svg-ruta-4" points="42,248 78,225 78,150 93,90" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" opacity="0.35" />
+                    <polyline id="svg-ruta-5" points="42,248 115,195 170,120 198,78" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" opacity="0.35" />
+
+                    <g style="cursor:pointer" onclick="seleccionarBalizaEnMapa('Baliza de Acceso Principal · Entrada Principal', 'Bienvenido al campus. La rampa de acceso está a cinco metros a tu derecha.')">
+                        <circle cx="42" cy="248" r="8" fill="rgba(56,189,248,0.25)" />
+                        <circle cx="42" cy="248" r="4.5" fill="#38bdf8" />
+                    </g>
+                    <g style="cursor:pointer" onclick="seleccionarBalizaEnMapa('Baliza Pasillo Aulario · Aulario Norte', 'Pasillo del Aulario. Baño accesible a diez metros, mano derecha.')">
+                        <circle cx="93" cy="86" r="8" fill="rgba(56,189,248,0.25)" />
+                        <circle cx="93" cy="86" r="4.5" fill="#38bdf8" />
+                    </g>
+                    <g style="cursor:pointer" onclick="seleccionarBalizaEnMapa('Baliza Laboratorios · Laboratorios', 'Laboratorios. Tu mesa adaptada es la número tres, junto a la ventana.')">
+                        <circle cx="118" cy="160" r="8" fill="rgba(56,189,248,0.25)" />
+                        <circle cx="118" cy="160" r="4.5" fill="#38bdf8" />
+                    </g>
+                    <g style="cursor:pointer" onclick="seleccionarBalizaEnMapa('Baliza Hall Biblioteca · Biblioteca', 'Estás en la Biblioteca. La puerta accesible y el ascensor están al fondo del hall.')">
+                        <circle cx="198" cy="64" r="8" fill="rgba(56,189,248,0.25)" />
+                        <circle cx="198" cy="64" r="4.5" fill="#38bdf8" />
+                    </g>
+                    <g style="cursor:pointer" onclick="seleccionarBalizaEnMapa('Baliza Cafetería · Cafetería', 'Cafetería. Mostrador adaptado en la zona derecha y mesas con espacio para silla de ruedas.')">
+                        <circle cx="349" cy="64" r="8" fill="rgba(56,189,248,0.25)" />
+                        <circle cx="349" cy="64" r="4.5" fill="#38bdf8" />
+                    </g>
+                </svg>
+
+                <div class="map-legend">
+                    <span class="legend-item"><span class="line-sample" style="background:#10b981"></span> Sin escalones</span>
+                    <span class="legend-item"><span class="line-sample" style="background:#f59e0b"></span> Asistida</span>
+                    <span class="legend-item"><span class="line-sample" style="background:#94a3b8"></span> Estándar</span>
+                    <span class="legend-item"><span class="dot-sample"></span> Baliza Bluetooth</span>
+                </div>
+            </div>
+
+            <section class="card" id="detalleRutaCard"></section>
+        </div>
+
+        <!-- ==================== VISTA 3: BALIZAS DEL CAMPUS ==================== -->
+        <div id="vista-balizas" class="vista">
+            <div>
+                <h2>Balizas del campus</h2>
+                <p class="card-sub" style="margin-bottom: 4px;">Cada baliza Bluetooth detecta tu ubicación y emite una alerta de audio, vibración o guía visual según tu perfil.</p>
+            </div>
+
+            <!-- Banner azul de alerta activa -->
+            <div class="beacon-alert-banner" id="beaconBanner">
+                <div>
+                    <div class="beacon-alert-title" id="bannerTitulo">Baliza Hall Biblioteca · Biblioteca</div>
+                    <div class="beacon-alert-text" id="bannerTexto">Estás en la Biblioteca. La puerta accesible y el ascensor están al fondo del hall.</div>
+                </div>
+                <button type="button" class="btn-close-banner" aria-label="Cerrar alerta" onclick="cerrarBannerBaliza()">×</button>
+            </div>
+
+            <!-- Lista de tarjetas de balizas generada dinámicamente -->
+            <div id="listaBalizas" style="display: flex; flex-direction: column; gap: 14px;"></div>
+        </div>
+
+        <!-- ==================== VISTA 4: PROYECTO SMARTBAND ==================== -->
+        <div id="vista-proyecto" class="vista">
+            <section class="card">
+                <h2>Proyecto SmartBand</h2>
+                <p class="card-sub">Información completa de nuestra propuesta tecnológica.</p>
+
+                <div class="tabs">
+                    <button type="button" class="tab-btn active" data-tab="funcionamiento">Funcionamiento</button>
+                    <button type="button" class="tab-btn" data-tab="diseno">Diseño</button>
+                    <button type="button" class="tab-btn" data-tab="proposito">Impacto social</button>
+                    <button type="button" class="tab-btn" data-tab="precio">Precio</button>
+                    <button type="button" class="tab-btn" data-tab="equipo">Equipo</button>
+                </div>
+
+                <div class="info-panel" id="panelInfo"></div>
+            </section>
+        </div>
+
+    </main>
+
+    <!-- Barra inferior fija -->
+    <nav class="bottom-nav">
+        <button type="button" class="nav-item active" data-nav="inicio" onclick="cambiarVista('inicio')">
+            <span>Inicio</span>
+        </button>
+        <button type="button" class="nav-item" data-nav="mapa" onclick="cambiarVista('mapa')">
+            <span>Mapa</span>
+        </button>
+        <button type="button" class="nav-item" data-nav="balizas" onclick="cambiarVista('balizas')">
+            <span>Balizas</span>
+        </button>
+        <button type="button" class="nav-item" data-nav="proyecto" onclick="cambiarVista('proyecto')">
+            <span>Proyecto</span>
+        </button>
+    </nav>
+
+    <script>
+        // Datos de las 6 rutas accesibles
+        const rutasData = [
+            {
+                id: 0,
+                titulo: 'Cafetería → Auditorio',
+                subtitulo: 'Cafetería → Auditorio',
+                tipo: 'Sin escalones',
+                extra: 'Silla de ruedas',
+                distancia: '300 m',
+                tiempo: '5 min',
+                pasos: [
+                    'Sal de la Cafetería hacia el sur',
+                    'Toma el sendero llano junto al jardín',
+                    'El Auditorio tiene rampa y espacios reservados junto a la puerta'
+                ]
+            },
+            {
+                id: 1,
+                titulo: 'Laboratorios → Cancha',
+                subtitulo: 'Laboratorios → Cancha',
+                tipo: 'Asistida',
+                extra: 'Silla de ruedas',
+                distancia: '240 m',
+                tiempo: '4 min',
+                pasos: [
+                    'Sal por la puerta este de Laboratorios siguiendo la guía táctil',
+                    'Avanza recto por el corredor central con alerta de baliza',
+                    'Ingresa a la zona de Cancha por el acceso nivelado'
+                ]
+            },
+            {
+                id: 2,
+                titulo: 'Aulario → Laboratorios',
+                subtitulo: 'Aulario Norte → Laboratorios',
+                tipo: 'Estándar',
+                extra: '',
+                distancia: '120 m',
+                tiempo: '2 min',
+                pasos: [
+                    'Sal del Aulario Norte en dirección sur',
+                    'Continúa por el paso peatonal señalizado',
+                    'Llegada a la entrada principal de Laboratorios'
+                ]
+            },
+            {
+                id: 3,
+                titulo: 'Biblioteca → Cafetería',
+                subtitulo: 'Biblioteca → Cafetería',
+                tipo: 'Sin escalones',
+                extra: 'Silla de ruedas',
+                distancia: '150 m',
+                tiempo: '3 min',
+                pasos: [
+                    'Toma el pasillo exterior este desde Biblioteca',
+                    'Sigue la línea plana sin desniveles',
+                    'Acceso directo a la entrada norte de Cafetería'
+                ]
+            },
+            {
+                id: 4,
+                titulo: 'Entrada Principal → Aulario Norte',
+                subtitulo: 'Entrada Principal → Aulario Norte',
+                tipo: 'Asistida',
+                extra: 'Silla de ruedas',
+                distancia: '380 m',
+                tiempo: '6 min',
+                pasos: [
+                    'Inicia en la baliza de Entrada Principal hacia el norte',
+                    'Sigue el borde del jardín guiado por vibración suave',
+                    'Gira a la derecha frente a Laboratorios hasta Aulario Norte'
+                ]
+            },
+            {
+                id: 5,
+                titulo: 'Entrada Principal → Biblioteca',
+                subtitulo: 'Entrada Principal → Biblioteca',
+                tipo: 'Sin escalones',
+                extra: 'Silla de ruedas',
+                distancia: '340 m',
+                tiempo: '5 min',
+                pasos: [
+                    'Avanza desde Entrada Principal por la rampa continua',
+                    'Cruza la plazoleta central siguiendo las balizas de acceso',
+                    'Entrada accesible a Biblioteca al frente'
+                ]
+            }
+        ];
+
+        // Datos de las balizas del campus
+        const balizasData = [
+            {
+                id: 'b01',
+                nombre: 'Baliza de Acceso Principal',
+                zona: 'Entrada Principal',
+                codigo: 'RS-B01',
+                estado: 'Activa',
+                mensaje: 'Bienvenido al campus. La rampa de acceso está a cinco metros a tu derecha.',
+                bateria: 92,
+                modo: 'Audio y visual'
+            },
+            {
+                id: 'b02',
+                nombre: 'Baliza Hall Biblioteca',
+                zona: 'Biblioteca',
+                codigo: 'RS-B02',
+                estado: 'Activa',
+                mensaje: 'Estás en la Biblioteca. La puerta accesible y el ascensor están al fondo del hall.',
+                bateria: 88,
+                modo: 'Audio'
+            },
+            {
+                id: 'b03',
+                nombre: 'Baliza Pasillo Aulario',
+                zona: 'Aulario Norte',
+                codigo: 'RS-B03',
+                estado: 'Activa',
+                mensaje: 'Pasillo del Aulario. Baño accesible a diez metros, mano derecha.',
+                bateria: 76,
+                modo: 'Visual'
+            },
+            {
+                id: 'b04',
+                nombre: 'Baliza Cafetería',
+                zona: 'Cafetería',
+                codigo: 'RS-B04',
+                estado: 'Activa',
+                mensaje: 'Cafetería. Mostrador adaptado en la zona derecha y mesas con espacio para silla de ruedas.',
+                bateria: 81,
+                modo: 'Audio y visual'
+            },
+            {
+                id: 'b05',
+                nombre: 'Baliza Laboratorios',
+                zona: 'Laboratorios',
+                codigo: 'RS-B05',
+                estado: 'Activa',
+                mensaje: 'Laboratorios. Tu mesa adaptada es la número tres, junto a la ventana.',
+                bateria: 95,
+                modo: 'Audio'
+            },
+            {
+                id: 'b06',
+                nombre: 'Baliza Cancha',
+                zona: 'Cancha',
+                codigo: 'RS-B06',
+                estado: 'Inactiva',
+                mensaje: 'Cancha deportiva. Rampa de acceso por la grada este.',
+                bateria: 64,
+                modo: 'Visual'
+            },
+            {
+                id: 'b07',
+                nombre: 'Baliza Auditorio',
+                zona: 'Auditorio',
+                codigo: 'RS-B07',
+                estado: 'Mantenimiento',
+                mensaje: 'Auditorio. Espacios reservados en la primera fila, junto a la puerta.',
+                bateria: 58,
+                modo: 'Audio y visual'
+            }
+        ];
+
+        let filtroActual = 'todas';
+        let rutaSeleccionadaId = 0;
+
+        function cambiarVista(nombreVista) {
+            document.querySelectorAll('.vista').forEach(v => v.classList.remove('activa'));
+            document.getElementById('vista-' + nombreVista).classList.add('activa');
+
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.nav === nombreVista);
+            });
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderizarRutas() {
+            const contenedor = document.getElementById('listaRutas');
+            contenedor.innerHTML = '';
+
+            const filtradas = filtroActual === 'todas'
+                ? rutasData
+                : rutasData.filter(r => r.tipo === filtroActual);
+
+            filtradas.forEach(ruta => {
+                const pillClass = ruta.tipo === 'Sin escalones'
+                    ? 'pill-green'
+                    : (ruta.tipo === 'Asistida' ? 'pill-yellow' : 'pill-gray');
+
+                const card = document.createElement('div');
+                card.className = 'route-card' + (ruta.id === rutaSeleccionadaId ? ' selected' : '');
+                card.onclick = () => seleccionarRuta(ruta.id);
+
+                card.innerHTML = `
+                    <div class="route-title">${ruta.titulo}</div>
+                    <div class="route-sub">${ruta.subtitulo}</div>
+                    <div class="badges-row">
+                        <span class="pill ${pillClass}">${ruta.tipo}</span>
+                        ${ruta.extra ? `<span class="pill pill-blue">${ruta.extra}</span>` : ''}
+                    </div>
+                `;
+                contenedor.appendChild(card);
+            });
+
+            actualizarDetalleRuta();
+            resaltarRutaEnPlano();
+        }
+
+        function seleccionarRuta(id) {
+            rutaSeleccionadaId = id;
+            renderizarRutas();
+            if (navigator.vibrate) navigator.vibrate(90);
+        }
+
+        function resaltarRutaEnPlano() {
+            rutasData.forEach(r => {
+                const poly = document.getElementById('svg-ruta-' + r.id);
+                if (!poly) return;
+                if (r.id === rutaSeleccionadaId) {
+                    poly.setAttribute('opacity', '1');
+                    poly.setAttribute('stroke-width', '4.2');
+                } else {
+                    poly.setAttribute('opacity', '0.28');
+                    poly.setAttribute('stroke-width', '2.2');
+                }
+            });
+        }
+
+        function actualizarDetalleRuta() {
+            const ruta = rutasData.find(r => r.id === rutaSeleccionadaId) || rutasData[0];
+            const pillClass = ruta.tipo === 'Sin escalones'
+                ? 'pill-green'
+                : (ruta.tipo === 'Asistida' ? 'pill-yellow' : 'pill-gray');
+
+            const pasosHtml = ruta.pasos.map((paso, idx) => `
+                <div class="step-row">
+                    <div class="step-num">${idx + 1}</div>
+                    <div>${paso}</div>
+                </div>
+            `).join('');
+
+            document.getElementById('detalleRutaCard').innerHTML = `
+                <div class="step-header">
+                    <h2>${ruta.titulo}</h2>
+                    <span class="pill ${pillClass}">${ruta.tipo}</span>
+                </div>
+                <div class="step-meta">
+                    <span>Distancia: <strong>${ruta.distancia}</strong></span>
+                    <span>Tiempo: <strong>${ruta.tiempo}</strong></span>
+                </div>
+                <div class="label-group" style="margin-bottom:4px;">Indicaciones paso a paso</div>
+                <div class="step-list">${pasosHtml}</div>
+                <button type="button" class="btn-primary" onclick="simularGuiaRuta('${ruta.titulo}')">Enviar guía a SmartBand</button>
+                <div class="feedback-msg" id="msgRuta"></div>
+            `;
+        }
+
+        function simularGuiaRuta(nombreRuta) {
+            if (navigator.vibrate) navigator.vibrate([120, 70, 120]);
+            const msg = document.getElementById('msgRuta');
+            if (msg) msg.textContent = `Ruta "${nombreRuta}" sincronizada con la pulsera por Bluetooth.`;
+            leerEnVozAlta(`Iniciando ruta ${nombreRuta}`);
+        }
+
+        function seleccionarBalizaEnMapa(titulo, mensaje) {
+            if (navigator.vibrate) navigator.vibrate([80, 50, 80]);
+            document.getElementById('detalleRutaCard').innerHTML = `
+                <div class="step-header">
+                    <h2>${titulo}</h2>
+                    <span class="pill pill-blue">Bluetooth</span>
+                </div>
+                <p style="font-size:0.94rem; color:var(--texto); margin-top:6px;">${mensaje}</p>
+            `;
+            leerEnVozAlta(`${titulo}. ${mensaje}`);
+        }
+
+        // Renderizar tarjetas de Balizas del campus
+        function renderizarBalizas() {
+            const cont = document.getElementById('listaBalizas');
+            cont.innerHTML = '';
+
+            balizasData.forEach(b => {
+                let badgeClass = 'status-activa';
+                if (b.estado === 'Mantenimiento') badgeClass = 'status-mantenimiento';
+                if (b.estado === 'Inactiva') badgeClass = 'status-inactiva';
+
+                const deshabilitada = b.estado !== 'Activa';
+
+                const card = document.createElement('div');
+                card.className = 'beacon-card';
+                card.innerHTML = `
+                    <div class="beacon-top">
+                        <div>
+                            <div class="beacon-name-row">
+                                <span class="beacon-icon">((o))</span>
+                                <span>${b.nombre}</span>
+                            </div>
+                            <div class="beacon-code">${b.zona} · Código ${b.codigo}</div>
+                        </div>
+                        <span class="status-badge ${badgeClass}">${b.estado}</span>
+                    </div>
+
+                    <p class="beacon-msg">${b.mensaje}</p>
+
+                    <div class="battery-row">
+                        <span class="battery-icon">BAT</span>
+                        <div class="battery-track">
+                            <div class="battery-fill" style="width:${b.bateria}%"></div>
+                        </div>
+                        <span class="battery-pct">${b.bateria}%</span>
+                    </div>
+
+                    <div class="beacon-actions">
+                        <span class="mode-tag">${b.modo}</span>
+                        <button type="button" class="btn-test-alert" ${deshabilitada ? 'disabled' : ''} onclick="probarAlertaBaliza('${b.id}')">
+                            <span>▶</span>
+                            <span>Probar alerta</span>
+                        </button>
+                    </div>
+                `;
+                cont.appendChild(card);
+            });
+        }
+
+        function probarAlertaBaliza(id) {
+            const b = balizasData.find(item => item.id === id);
+            if (!b || b.estado !== 'Activa') return;
+
+            if (navigator.vibrate) navigator.vibrate([140, 70, 140]);
+
+            const banner = document.getElementById('beaconBanner');
+            banner.classList.remove('hidden');
+            document.getElementById('bannerTitulo').textContent = `${b.nombre} · ${b.zona}`;
+            document.getElementById('bannerTexto').textContent = b.mensaje;
+
+            leerEnVozAlta(`${b.nombre}. ${b.mensaje}`);
+            banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function cerrarBannerBaliza() {
+            document.getElementById('beaconBanner').classList.add('hidden');
+        }
+
+        function leerEnVozAlta(texto) {
+            const audioActivo = document.getElementById('chkAudio').checked;
+            if (audioActivo && 'speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utter = new SpeechSynthesisUtterance(texto);
+                utter.lang = 'es-ES';
+                window.speechSynthesis.speak(utter);
+            }
+        }
+
+        // Filtros de rutas
+        document.querySelectorAll('#filtrosRutas .chip').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('#filtrosRutas .chip').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                filtroActual = btn.dataset.filter;
+                const primera = filtroActual === 'todas'
+                    ? rutasData[0]
+                    : rutasData.find(r => r.tipo === filtroActual);
+                if (primera) rutaSeleccionadaId = primera.id;
+                renderizarRutas();
+            });
+        });
+
+        // Perfil de accesibilidad
+        let discapacidadActual = 'Visual';
+        document.querySelectorAll('#chipsDiscapacidad .chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                document.querySelectorAll('#chipsDiscapacidad .chip').forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                discapacidadActual = chip.dataset.val;
+            });
+        });
+
+        document.getElementById('chkContraste').addEventListener('change', (e) => {
+            document.body.classList.toggle('alto-contraste', e.target.checked);
+        });
+
+        document.getElementById('btnGuardar').addEventListener('click', () => {
+            const evitarEscaleras = document.getElementById('chkEscaleras').checked;
+            if (evitarEscaleras) {
+                filtroActual = 'Sin escalones';
+                rutaSeleccionadaId = 0;
+                document.querySelectorAll('#filtrosRutas .chip').forEach(c => {
+                    c.classList.toggle('active', c.dataset.filter === 'Sin escalones');
+                });
+                renderizarRutas();
+            }
+            document.getElementById('mensajePerfil').textContent =
+                `Preferencias guardadas (Perfil: ${discapacidadActual}${evitarEscaleras ? ' • Priorizando rutas sin escalones' : ''}).`;
+            leerEnVozAlta('Preferencias guardadas correctamente');
+        });
+
+        // Pestañas de información del proyecto
+        const infoProyecto = {
+            funcionamiento: `<p>Nuestro proyecto consiste en el desarrollo de una pulsera inteligente diseñada para facilitar la orientación y el desplazamiento de personas con discapacidad visual en espacios previamente configurados. El dispositivo estará conectado a una aplicación móvil mediante tecnología Bluetooth, permitiendo establecer configuraciones personalizadas de acuerdo con las características de cada entorno. Su principal mecanismo de orientación se basa en un sistema de vibraciones que permitirá transmitir indicaciones al usuario durante sus desplazamientos, ofreciendo una alternativa de comunicación táctil que no depende exclusivamente de estímulos visuales. De esta manera, buscamos desarrollar una herramienta tecnológica que contribuya a mejorar la autonomía y facilite la interacción con diferentes espacios cotidianos.</p>`,
+            diseno: `<p>La pulsera ha sido concebida bajo un enfoque de diseño funcional, comodidad y accesibilidad. Su estructura portátil busca permitir que el usuario pueda llevarla consigo de manera práctica durante sus actividades diarias. La integración con una aplicación móvil mediante Bluetooth permitirá gestionar las configuraciones del dispositivo y adaptar sus indicaciones según las necesidades del usuario. A través de un sistema de retroalimentación mediante vibraciones, el proyecto propone una manera intuitiva de transmitir información sobre la orientación y el recorrido. Nuestra propuesta combina innovación tecnológica y diseño centrado en las personas, buscando que la accesibilidad forme parte fundamental de cada decisión de desarrollo.</p>`,
+            proposito: `<p>Creemos que la tecnología tiene el potencial de transformar positivamente la vida de las personas cuando se desarrolla con un propósito social. Este proyecto nace con la intención de ofrecer una alternativa innovadora para las personas con discapacidad visual, facilitando su orientación en espacios específicos y promoviendo una mayor independencia en sus desplazamientos. Nuestro propósito va más allá de desarrollar un dispositivo electrónico. Buscamos contribuir a una sociedad más inclusiva, en la que las herramientas tecnológicas permitan reducir barreras y generar nuevas oportunidades. Aspiramos a que nuestra propuesta represente un paso hacia un futuro donde la innovación esté verdaderamente al servicio de todos.</p>`,
+            precio: `<p>Como propuesta inicial de comercialización, se estima un precio de lanzamiento asequible, procurando que sus beneficios puedan estar al alcance de un público amplio. El precio es una estimación inicial que podrá ajustarse de acuerdo con los costos de fabricación, los componentes tecnológicos y el desarrollo de la aplicación móvil. Nuestro objetivo es ofrecer una solución innovadora que combine funcionalidad, calidad y accesibilidad económica.</p><span class="precio-destacado">Precio estimado de lanzamiento: $129.900 COP</span>`,
+            equipo: `<p>Este proyecto ha sido desarrollado por:<br><br>
+            • Nicolás Becerra Hernández<br>
+            • Juan José Ruiz Gallego<br>
+            • Jhoan Peñareaz Ovalle<br>
+            • José Miguel Gómez<br>
+            • Juan Diego Herrera<br>
+            • Heypreel Hernández Uribe</p>`
+        };
+
+        const panelInfo = document.getElementById('panelInfo');
+        panelInfo.innerHTML = infoProyecto.funcionamiento;
+
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                panelInfo.innerHTML = infoProyecto[btn.dataset.tab];
+            });
+        });
+
+        // Inicializar vistas
+        renderizarRutas();
+        renderizarBalizas();
+    </script>
+</body>
+</html>
